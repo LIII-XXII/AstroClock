@@ -94,13 +94,18 @@ class Stepper:
 logger.info('Start!')
 
 azimuthStepper = Stepper()
+servoAngle = 0
 
 while True:
     orbit = (SAT - TOKYO).at(TS.now())
     alt, az, distance = orbit.altaz()
+    # do not turn on servo for a move of less than 1 degree
+    if round(alt.degrees) != servoAngle:
+        SERVO.value = alt.degrees / 90
+        servoAngle = round(alt.degrees)
     # TODO check if servo needs to move and if not turn it off to avoid jerk
     if azimuthStepper.go2angle(az.degrees):
         # stepper moved
-        SERVO.value = alt.degrees / 90
-        logger.info("now pointing at: az %s, el %s, dist %.1f km", alt, az, distance.km)
+        logger.info("now pointing at: altitude %s, azimuth %s, distance %.1f km", alt, az, distance.km)
     sleep(1) # no need to update too often
+    SERVO.detach() # disable servo to stop jitter while it does not need to move
