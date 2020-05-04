@@ -44,9 +44,8 @@ class Stepper:
         sleep(self.PERIOD)
         self.STEP.toggle()
         sleep(self.PERIOD)
-        return
 
-    def reverse(self, direction) -> bool:
+    def reverse(self) -> bool:
         self.DIR.toggle()
         self.current_direction_is_forward = not self.current_direction_is_forward
         return self.current_direction_is_forward
@@ -55,14 +54,11 @@ class Stepper:
         fromStep = self.current_step
         if numsteps is None:
             numsteps = 1
-        if numsteps < 0:
+        if numsteps < 0 != self.current_direction_is_forward: # logical XOR
             self.reverse()
 
         for i in range(abs(int(numsteps))):
             self.doStep()
-
-        if numsteps < 0:
-            self.reverse()
 
         self.current_step += numsteps
         logger.debug("stepped %d from %d to %d", numsteps, fromStep, self.current_step)

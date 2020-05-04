@@ -36,6 +36,8 @@ You need:
 - add 3D printable parts
   - parametric OpenSCAD?
 
+- unit tests for the `Stepper` class
+
 ## Troubleshooting
 
 - numpy 1.14.3 can't open libf77blas.so.3 on Raspberry Pi Zero W (arm6)
