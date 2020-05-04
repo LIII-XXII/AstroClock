@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.5
 """points at a satellite in the sky"""
 
 import logging
@@ -24,7 +24,6 @@ SERVO = gpiozero.Servo(
 
 
 class Stepper:
-
     "Stepper motor helper class"
 
     STEPPER_RESOLUTION = 200  # 1.8deg per step
@@ -33,8 +32,9 @@ class Stepper:
     DIR = gpiozero.OutputDevice(21)
     PERIOD = 1 / 2000  # bitbanged stepper STEP signal length
 
-    current_step = 0
-    current_direction_is_forward = True
+    def __init__(self):
+        self.current_step = 0
+        self.current_direction_is_forward = True
 
     def getPos(self) -> int:
         return self.current_step
@@ -46,12 +46,15 @@ class Stepper:
         sleep(self.PERIOD)
         return
 
-    def reverse(self) -> bool:
+    def reverse(self, direction) -> bool:
         self.DIR.toggle()
         self.current_direction_is_forward = not self.current_direction_is_forward
         return self.current_direction_is_forward
 
-    def step(self, numsteps: int = 1) -> int:
+    def step(self, numsteps = None) -> int:
+        fromStep = self.current_step
+        if numsteps is None:
+            numsteps = 1
         if numsteps < 0:
             self.reverse()
 
@@ -62,6 +65,7 @@ class Stepper:
             self.reverse()
 
         self.current_step += numsteps
+        logger.debug("stepped %d from %d to %d", numsteps, fromStep, self.current_step)
         return self.current_step
 
     def getAngle(self) -> float:
@@ -73,25 +77,30 @@ class Stepper:
 
     @staticmethod
     def deg2step(deg: float) -> int:
-        return deg * Stepper.STEPPER_RESOLUTION * Stepper.MICROSTEPS / 360
+        return round(deg * Stepper.STEPPER_RESOLUTION * Stepper.MICROSTEPS / 360)
 
     def go2step(self, toStep: int) -> int:
-        return self.step(toStep - self.getPos())
+        """returns number of steps done"""
+        diff = toStep - self.getPos()
+        if diff != 0:
+            logger.debug('Stepping...')
+            return self.step(diff)
+        return diff
 
     def go2angle(self, toAngle: float) -> int:
-        """return number of stepped steps"""
-        targetStep = int(self.deg2step(toAngle))
-        if targetStep != self.getPos():
-            logger.info('Stepping...')
-            return self.go2step(targetStep)
-        return 0
+        """returns number of steps done"""
+        return self.go2step(self.deg2step(toAngle))
 
 logger.info('Start!')
 
+azimuthStepper = Stepper()
+
 while True:
-    azimuthStepper = Stepper()
     orbit = (SAT - TOKYO).at(TS.now())
     alt, az, distance = orbit.altaz()
+    # TODO check if servo needs to move and if not turn it off to avoid jerk
     if azimuthStepper.go2angle(az.degrees):
+        # stepper moved
         SERVO.value = alt.degrees / 90
-        logger.debug('now pointing towards:', alt, az, distance.km)
+        logger.info("now pointing at: az %s, el %s, dist %.1f km", alt, az, distance.km)
+    sleep(1) # no need to update too often

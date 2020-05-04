@@ -1,0 +1,6 @@
+skyfield
+#apt install python3-numpy
+numpy
+#apt install python3-gpiozero
+gpiozero
+pytz
