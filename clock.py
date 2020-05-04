@@ -5,7 +5,7 @@ import logging
 from time import sleep
 
 from pytz import timezone
-#import numpy
+# import numpy
 
 import gpiozero
 from skyfield import api as skyfapi
