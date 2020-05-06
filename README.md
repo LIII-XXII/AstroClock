@@ -5,19 +5,24 @@ A clock that points at a satellite! Build your own International Space Station t
 You need:
 - a Raspberry Pi
   - we are using a Pi Zero because it is low power, but any model should work
-  - https://www.raspberrypi.org/
+    - https://www.raspberrypi.org/
 - a stepper motor
   - smaller looks better, it just needs to move the clock hand
   - we are using a Tamagawa TS3692N65 (200 steps per revolution) but any NEMA stepper is fine.
+    - datasheet scan available here: https://wakamatsu.co.jp/biz/products/detail.php?product_id=62020023
   - the number of steps per revolution needs to be adjusted for different models
 - a servo motor
   - again, smaller looks better
   - we are using a Tower Pro SG92R
+    - http://www.towerpro.com.tw/product/sg92r-7/
   - the duty cycle will need to be adjusted for different models
+    - use `servo.py` to test/tweak if needed
 - a stepper motor driver board
-  - it supports microstepping, but we currently do not use the feature
-  - we are using an EasyDriver and recommend supporting the designer by buying a board from them
-  - http://www.schmalzhaus.com/EasyDriver/index.html
+  - we are using an EasyDriver (16 microsteps by default)
+  - adjust microstepping if needed
+    - you can use servo.py to test/tweak if needed
+  - support the designer by buying a board from them
+    - http://www.schmalzhaus.com/EasyDriver/index.html
 
 ## Feature wishlist / TODO list
 
@@ -31,12 +36,14 @@ You need:
 
 - automagically make it detect its own location
 
-- add BOM
+- ~~add BOM~~
 
 - add 3D printable parts
   - parametric OpenSCAD?
 
 - unit tests for the `Stepper` class
+
+- add pictures
 
 ## Troubleshooting
 
