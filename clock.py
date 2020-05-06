@@ -99,7 +99,6 @@ while True:
     if round(alt.degrees) != servoAngle:
         SERVO.value = alt.degrees / 90
         servoAngle = round(alt.degrees)
-    # TODO check if servo needs to move and if not turn it off to avoid jerk
     if azimuthStepper.go2angle(az.degrees):
         # stepper moved
         logger.info("now pointing at: altitude %s, azimuth %s, distance %.1f km", alt, az, distance.km)
